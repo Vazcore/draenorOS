@@ -1,0 +1,103 @@
+.cls{
+	clear: both;
+	margin: 0;
+	padding: 0;
+}
+
+body{
+	background-image: url("../img/bg.png");
+}
+
+#main{
+	width: 800px;	
+	margin: 0 auto;
+	font-family: Tahoma;
+	font-size: 12px;
+}
+
+header{
+	/*Header*/
+	overflow: hidden;
+	padding: 20px 0;	
+}
+
+header div{
+	float: left;
+}
+
+#sitename h1{
+	color: white;
+	padding-left: 20px;
+	font-family: Tahoma;
+	font-size: 22px;
+}
+
+#sitename h4{
+	color: white;
+	float: right;
+}
+
+#user-info{
+	float: right;
+	width: 300px;	
+	background-color: #4C5766;	
+}
+
+#user-foto{
+	padding: 5px 5px;
+}
+
+#user-details{
+	padding-left: 10px;
+	color: white;	
+}
+
+article{
+	background-color: #F0F0F0;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	overflow: hidden;
+	padding: 10px;
+}
+
+#console{
+	width: 48%;		
+	float: left;
+}
+
+#system-msg{
+	width: 48%;	
+	float: right;
+}
+
+#cosnoleDisplay{
+	height: 250px;
+	background-color:white;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	border: 1px solid silver;
+	margin: 15px 0;
+	padding:5px;
+	overflow-y: scroll;	
+}
+
+#system-msg{
+	color: green;
+	overflow-y: scroll;
+	height: 250px;
+}
+
+#console-input{
+	width: 300px;
+	margin: 0 auto;
+}
+
+#console-input input{
+	width: 100%;
+	padding: 4px 10px;
+	border: 1px solid rgb(190,190,190);
+}

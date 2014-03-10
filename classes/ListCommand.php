@@ -54,7 +54,7 @@ class ListCommand {
 
 	// Текущее расположение пользователя
 	function os_wpath(){
-		return $this->desc." : ".$this->nav->whereIam();	
+		return $this->desc." : ".$this->nav->whereIam("none");	
 	}
 
 	// Выйти из системы
@@ -78,10 +78,16 @@ class ListCommand {
 	// Создание директории
 	function os_wcrd(){
 		if(!isset($this->allInfo[1])){
-			echo "Ошибка! Не указано имя каталога";
+			echo "Ошибка! Не указано имя каталога";			
 		}else{
-			
+			return $this->desc." : ".$this->os->createNode("U", "D", $this->allInfo[1], $this->nav->whereIam("id"));			
 		}
+	}
+
+	// Просмотр содержимвого директории
+	function os_wls(){
+		$dir_id = $this->nav->whereIam("id");
+		return $this->desc." : ".$this->hd->showWhatInDir($dir_id);
 	}
 
 }

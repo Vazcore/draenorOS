@@ -33,6 +33,13 @@ class User{
 		return $row;
 	}
 
+	function getUser($id){		
+			$res = $this->bd->query("SELECT name, role, location_id FROM os_users WHERE id = '$id' ");
+			$row = $res->fetch_array();
+		
+		return $row;
+	}
+
 	function login_user($command){
 		$homeDir = $this->hd->get_home_dir();
 

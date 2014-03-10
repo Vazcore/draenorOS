@@ -1,16 +1,19 @@
 <?php
 require_once "Config.php";
 require_once "Bd.php";
+require_once "User.php";
 
 class HardDrive{
 	private $total_space = Config::DISK_SPACE;
 	private $cluster_size = Config::CLUSTER_SPACE;
 	
 	private $bd;
+	private $user;
 
 	function __construct(){
 		$base = new Bd();
 		$this->bd = $base->get_connection();
+		//$this->user = new User();
 	}
 
 	function init(){
@@ -44,6 +47,38 @@ class HardDrive{
 	function get_home_dir(){
 		$h_d = Config::OS_SIZE/$this->cluster_size + 1;
 		return $h_d;
+	}
+
+	function showWhatInDir($dir_id){
+		$html = '
+		<table border="1">
+			<tr>
+				<td>#</td>
+				<td>Название</td>
+				<td>Размер</td>
+				<td>Дата срздания</td>
+				<td>Доступ</td>
+				<td> ID создателя</td>
+			</tr>';
+
+		$res = $this->bd->query("SELECT * FROM os_nodes WHERE parent='$dir_id' ");
+		while($row = $res->fetch_array()){
+			$add_html = '
+				<tr>
+					<td>'.$row['begin'].'</td>
+					<td>'.$row['name'].'</td>
+					<td>'.$row['size'].'</td>
+					<td>'.$row['date'].'</td>
+					<td>'.$row['access'].'</td>
+					<td>'.$row['creator'].'</td>
+				</tr>
+			';
+			$html = $html.$add_html;
+		}
+		$html = $html."</table>"; 
+		
+		return $html;
+
 	}
 }
 ?>

@@ -43,6 +43,8 @@ class Commands {
 			if(isset($parts[1])){
 				if($parts[1] == "--desc"){
 					echo "<font color='orange'>Подсказка: описание комманды ".$parts[0].". </font>".$row['desc'];
+				}else{
+					$this->initProccess($parts);
 				}
 			}else{
 				$this->initProccess($parts);

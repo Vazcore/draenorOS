@@ -52,9 +52,9 @@ class OS{
 		$this->hd->init();
 
 		// Запись системных данных		
-		$this->createNode("S","F","draenor.sys","sys");		
+		$this->createNode("S","F","draenor.sys","-1");		
 
-		$this->createNode("U","D","home","/");
+		$this->createNode("U","D","home","0");
 
 	}
 
@@ -71,7 +71,7 @@ class OS{
 		}
 		
 			if($type == "S"){
-				$sf = new SYSTEM_FILE($name, "sys");
+				$sf = new SYSTEM_FILE($name, $location);
 			}elseif ($type == "U") {
 				if($file_kind == "D"){
 					// Dir

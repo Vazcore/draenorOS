@@ -29,13 +29,14 @@ require_once "BitMap.php";
 				$type = "S";
 				$file_kind = "F";
 				$access = "0-0-0";
+				$user_id = $_SESSION['user_id'];
 
 
 				$atrs = array($name,$parent,($id+0), $this->date, $type, $file_kind, $access);
 
 				$size = $this->os->calcSize($atrs);
 
-				$this->bd->query("INSERT INTO os_nodes (type,file_kind,access,begin,size,name,date) VALUES ('S','F','0-0-0','$id', '$size','$name','$this->date') ");
+				$this->bd->query("INSERT INTO os_nodes (type,file_kind,access,begin,size,name,parent,date,creator) VALUES ('S','F','0-0-0','$id', '$size','$name', $parent, '$this->date','$user_id') ");
 				$this->bd->query("UPDATE os_clusters SET type = 'S', status='busy' WHERE cluster_id='$id' ");
 			}else{
 				echo "Ошибка! Нет места на диске!";

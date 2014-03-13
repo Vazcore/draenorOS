@@ -62,19 +62,23 @@ class HardDrive{
 			</tr>';
 
 		$res = $this->bd->query("SELECT * FROM os_nodes WHERE parent='$dir_id' ");
-		while($row = $res->fetch_array()){
-			$add_html = '
-				<tr>
-					<td>'.$row['begin'].'</td>
-					<td>'.$row['name'].'</td>
-					<td>'.$row['size'].'</td>
-					<td>'.$row['date'].'</td>
-					<td>'.$row['access'].'</td>
-					<td>'.$row['creator'].'</td>
-				</tr>
-			';
-			$html = $html.$add_html;
-		}
+		if($res->num_rows != 0){
+			while($row = $res->fetch_array()){
+				$add_html = '
+					<tr>
+						<td>'.$row['begin'].'</td>
+						<td>'.$row['name'].'</td>
+						<td>'.$row['size'].'</td>
+						<td>'.$row['date'].'</td>
+						<td>'.$row['access'].'</td>
+						<td>'.$row['creator'].'</td>
+					</tr>
+				';
+				$html = $html.$add_html;
+			}
+		}else{
+			$html = $html."<tr><td colspan='6'><font color='red'>Каталог - пуст!</font></td></tr>";
+		}	
 		$html = $html."</table>"; 
 		
 		return $html;

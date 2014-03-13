@@ -40,7 +40,7 @@ class ListCommand {
 	
 	// Создать файл
 	function os_wcrf(){
-		if(!isset($this->allInfo[1])){
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
 			echo "Ошибка! Не указано имя файла";
 		}else{
 			//
@@ -77,11 +77,21 @@ class ListCommand {
 
 	// Создание директории
 	function os_wcrd(){
-		if(!isset($this->allInfo[1])){
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
 			echo "Ошибка! Не указано имя каталога";			
 		}else{
 			return $this->desc." : ".$this->os->createNode("U", "D", $this->allInfo[1], $this->nav->whereIam("id"));			
 		}
+	}
+
+	// Удаление директории
+	function os_wrmd(){
+		$parent_dir_id = $this->nav->whereIam("id");
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
+			echo "Ошибка! Не указано имя каталогя для удаления";
+		}else{
+			return $this->desc." : ".$this->os->removeDir($parent_dir_id, $this->allInfo[1]);
+		}		
 	}
 
 	// Просмотр содержимвого директории

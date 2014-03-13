@@ -58,6 +58,15 @@ class OS{
 
 	}
 
+	function alreadyExists($name, $parent){
+		$res = $this->bd->query("SELECT name FROM os_nodes WHERE parent = '$parent' AND name = '$name' ");	
+		if($res->num_rows != 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 
 	function createNode($type, $file_kind, $name, $location){
 		require_once "SYSTEM_FILE.php";
@@ -65,7 +74,7 @@ class OS{
 		require_once "Dir.php";
 		
 		if($file_kind == "D"){
-			$f_k = "каталог";
+			$f_k = "каталог";			
 		}else{
 			$f_k = "файл";
 		}
@@ -73,14 +82,49 @@ class OS{
 			if($type == "S"){
 				$sf = new SYSTEM_FILE($name, $location);
 			}elseif ($type == "U") {
-				if($file_kind == "D"){
+				// Проверка на существование файла(каталога)
+				if(!$this->alreadyExists($name, $location)){
+					if($file_kind == "D"){
 					// Dir
-					$ud = new Dir($name, $location);
+						$ud = new Dir($name, $location);
+					}else{
+						// File
+					}
 				}else{
-					// File
+					return "Ошибка! С таким именем уже существует!";
 				}
 			}
 		
+	}
+
+	function bd_select($table, $filter = array()){
+		// in Future
+	}
+
+	function removeDir($p_id, $dir){
+		$res = $this->bd->query("SELECT begin FROM os_nodes WHERE parent = '$p_id' AND name = '$dir' ");
+		$row = $res->fetch_array();
+		$cl_id = $row['begin'];
+
+
+		$res = $this->bd->query("SELECT data FROM os_clusters WHERE cluster_id = '$cl_id' ");
+		$row = $res->fetch_array();
+		if($row['data'] != "None"){
+			return "Директория не пуста!";
+		}else{
+			$res = $this->bd->query("UPDATE os_clusters SET status='free' WHERE cluster_id = '$cl_id' ");
+			$res = $this->bd->query("SELECT data FROM os_clusters WHERE cluster_id = '$p_id' ");
+			$row = $res->fetch_array();
+			$data = $row['data'];
+			$pos_id = strpos($data, $cl_id);
+			$ln = strlen($data);
+			for ($i=$pos_id; $i <= $pos_id+$ln; $i++) { 
+				$data[$i] = "";
+			}
+			$res = $this->bd->query("UPDATE os_clusters SET data='$data' WHERE cluster_id = '$p_id' ");
+			$res = $this->bd->query("DELETE FROM os_nodes WHERE parent = '$p_id' AND name = '$dir' ");
+		}
+
 	}
 
 	function calcSize($attrs){

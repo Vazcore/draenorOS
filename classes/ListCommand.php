@@ -97,7 +97,23 @@ class ListCommand {
 	// Просмотр содержимвого директории
 	function os_wls(){
 		$dir_id = $this->nav->whereIam("id");
-		return $this->desc." : ".$this->hd->showWhatInDir($dir_id);
+		return $this->desc."<font color='green'>".$this->nav->whereIam()."</font> : ".$this->hd->showWhatInDir($dir_id);
+	}
+
+	// Переход в указанную директорию
+	function os_wgo(){
+		$parent_dir_id = $this->nav->whereIam("id");
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
+			echo "Ошибка! Не указано имя каталогя для перехода";
+		}else{
+			$dirs = $this->hd->showWhatInDir($parent_dir_id, "dirs");		
+			return $this->os->moveToDir($this->allInfo[1], $dirs);
+		}		
+	}
+
+	function os_wgoback(){
+		$local_dir_id = $this->nav->whereIam("id");
+		return $this->os->moveBack($local_dir_id);
 	}
 
 }

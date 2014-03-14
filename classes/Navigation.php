@@ -18,7 +18,7 @@ class Navigation {
 		$this->bd  = $base->get_connection();
 	}
 		
-	function whereIam($variant){
+	function whereIam($variant = "none"){
 		$user_id = $_SESSION['user_id'];
 		$res = $this->bd->query("SELECT location_id FROM os_users WHERE id='$user_id' ");
 		$row = $res->fetch_array();

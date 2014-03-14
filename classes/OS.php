@@ -22,8 +22,11 @@ class OS{
 
 	function __construct(){
 		$base = new Bd();
-		$this->bd = $base->get_connection();			
+		$this->bd = $base->get_connection();	
+		$this->nav = new Navigation();		
 	}
+
+
 	
 	/*
 	function init(){
@@ -123,6 +126,7 @@ class OS{
 			}
 			$res = $this->bd->query("UPDATE os_clusters SET data='$data' WHERE cluster_id = '$p_id' ");
 			$res = $this->bd->query("DELETE FROM os_nodes WHERE parent = '$p_id' AND name = '$dir' ");
+			return " успешно выполнено";
 		}
 
 	}
@@ -138,6 +142,35 @@ class OS{
 			}
 		}
 		return $size;
+	}
+
+	function moveToDir($dir_to, $dirs){
+		$find_status = false;
+		foreach ($dirs as $key => $dir) {
+			if($dir_to == $dir['name']){
+				$find_status = true;
+				$dir_id = $dir['begin'];
+			}
+		}
+		if(!$find_status){
+			return "Ошибка! Директория с таким названием не найдена!";
+		}else{			
+			$user_id =  $_SESSION['user_id'];
+			$this->bd->query("UPDATE os_users SET location_id='$dir_id' WHERE id = '$user_id' ");
+		}
+	}
+
+	function moveBack($d_id){
+		$res = $this->bd->query("SELECT parent FROM os_nodes WHERE begin = '$d_id' ");	
+		$row = $res->fetch_array();
+		if($row['parent'] == 0){
+			return "Ошибка! Вы находитесь в корневой директории!";
+		}else{
+			$p_id = $row['parent'];
+			$user_id =  $_SESSION['user_id'];
+			$this->bd->query("UPDATE os_users SET location_id='$p_id' WHERE id = '$user_id' ");	
+			return "Вы успешно переместились в директорию - ".$this->nav->whereIam();
+		}
 	}
 
 }

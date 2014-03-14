@@ -49,7 +49,8 @@ class HardDrive{
 		return $h_d;
 	}
 
-	function showWhatInDir($dir_id){
+	function showWhatInDir($dir_id, $flag = "none"){
+		$dirs = array();
 		$html = '
 		<table border="1">
 			<tr>
@@ -64,6 +65,7 @@ class HardDrive{
 		$res = $this->bd->query("SELECT * FROM os_nodes WHERE parent='$dir_id' ");
 		if($res->num_rows != 0){
 			while($row = $res->fetch_array()){
+				$dirs[] = $row;
 				$add_html = '
 					<tr>
 						<td>'.$row['begin'].'</td>
@@ -81,7 +83,11 @@ class HardDrive{
 		}	
 		$html = $html."</table>"; 
 		
-		return $html;
+		if($flag == "dirs"){
+			return $dirs;
+		}else{
+			return $html;
+		}		
 
 	}
 }

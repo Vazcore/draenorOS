@@ -1,5 +1,5 @@
 <?php
-require_once "Config.php";
+require_once "Settings.php";
 require_once "HardDrive.php";
 require_once "Bd.php";
 require_once "User.php";
@@ -46,7 +46,7 @@ class OS{
 
 	function os_init(){
 		$this->start_cluster = 1;
-		$this->end_cluster = ceil(Config::OS_SIZE/Config::CLUSTER_SPACE);		
+		$this->end_cluster = ceil(Settings::OS_SIZE/Settings::CLUSTER_SPACE);		
 		
 		$this->hd = new HardDrive();
 		$this->bm = new BitMap();

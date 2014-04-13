@@ -12,12 +12,13 @@ function IO(){
 		$.ajax({
 			type: "POST",
 			url: "script/handler.php",
+			encoding:"UTF-8",			
 			data: {type:type, d:data},						
 			success: function(msg){
 				if(msg.slice(0,6) == "Ошибка"){
 					msg = "<font color='red'>"+msg+"</font>";
 				}				
-				display.prepend(msg+"<br>");
+				display.prepend(msg+"<br>");				
 				var jstry = new JSTry();
 				jstry.perform(msg);
 			}			

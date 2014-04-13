@@ -1,5 +1,5 @@
 <?php
-require_once "Config.php";
+require_once "Settings.php";
 require_once "HardDrive.php";
 require_once "Navigation.php";
 require_once "User.php";
@@ -7,7 +7,7 @@ require_once "OS.php";
 
 class ListCommand {
 	private $allInfo;
-	private $config;	
+	private $Settings;	
 	private $desc;
 	private $hd;
 	private $nav;
@@ -25,7 +25,7 @@ class ListCommand {
 	
 	// Общее дискоквое пространство
 	function os_wds(){		
-		return $this->desc." : ".Config::DISK_SPACE;
+		return $this->desc." : ".Settings::DISK_SPACE;
 	}
 	
 	// Очистить окно дисплея консоли
@@ -63,7 +63,7 @@ class ListCommand {
 	}
 
 	function os_wcluster_size(){
-		return $this->desc." : ".Config::CLUSTER_SPACE;		
+		return $this->desc." : ".Settings::CLUSTER_SPACE;		
 	}
 
 	function os_wos_init(){

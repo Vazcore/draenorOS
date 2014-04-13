@@ -1,19 +1,20 @@
 <?php
-require_once "Config.php";
+require_once "Settings.php";
 require_once "Bd.php";
 require_once "User.php";
 
 class HardDrive{
-	private $total_space = Config::DISK_SPACE;
-	private $cluster_size = Config::CLUSTER_SPACE;
-	
+	private $total_space;
+	private $cluster_size;	
 	private $bd;
 	private $user;
 
 	function __construct(){
 		$base = new Bd();
-		$this->bd = $base->get_connection();
+		$this->bd = $base->get_connection();		
 		//$this->user = new User();
+		$this->total_space = Settings::DISK_SPACE;
+		$this->cluster_size = Settings::CLUSTER_SPACE;
 	}
 
 	function init(){
@@ -23,7 +24,7 @@ class HardDrive{
 		// End truncate
 
 		for ($i=1; $i <= $this->get_total_clusters(); $i++) { 
-			if($i <= ceil(Config::OS_SIZE/Config::CLUSTER_SPACE)){
+			if($i <= ceil(Settings::OS_SIZE/Settings::CLUSTER_SPACE)){
 				$type = "S";
 			}else{
 				$type = "U";
@@ -40,12 +41,12 @@ class HardDrive{
 	function get_free_space(){
 		// Bit Map
 		// + os place
-		$fr_s = $this->total_space - Config::OS_SIZE;
+		$fr_s = $this->total_space - Settings::OS_SIZE;
 		return $fr_s;		
 	}
 	
 	function get_home_dir(){
-		$h_d = Config::OS_SIZE/$this->cluster_size + 1;
+		$h_d = Settings::OS_SIZE/$this->cluster_size + 1;
 		return $h_d;
 	}
 

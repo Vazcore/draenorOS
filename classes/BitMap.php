@@ -1,6 +1,6 @@
 <?php
 require_once "Bd.php";
-require_once "Config.php";
+require_once "Settings.php";
 
 class BitMap{
 	private $bd;
@@ -13,10 +13,10 @@ class BitMap{
 	function getCluster($type){
 		if($type == "S"){
 			$from_cluster = 1;
-			$s_clusters = ceil(Config::OS_SIZE/Config::CLUSTER_SPACE);
+			$s_clusters = ceil(Settings::OS_SIZE/Settings::CLUSTER_SPACE);
 		}else{
-			$from_cluster = ceil(Config::OS_SIZE/Config::CLUSTER_SPACE) + 1;			
-			$s_clusters = ceil(Config::DISK_SPACE/Config::CLUSTER_SPACE);			
+			$from_cluster = ceil(Settings::OS_SIZE/Settings::CLUSTER_SPACE) + 1;			
+			$s_clusters = ceil(Settings::DISK_SPACE/Settings::CLUSTER_SPACE);			
 		}		
 		$res = $this->bd->query("SELECT * FROM os_clusters WHERE (type = '$type' AND (cluster_id BETWEEN $from_cluster AND $s_clusters)) AND status = 'free' ");
 		if($res->num_rows == 0){

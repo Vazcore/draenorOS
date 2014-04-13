@@ -2,7 +2,7 @@
 require_once "User.php";
 require_once "HardDrive.php";
 require_once "Bd.php";
-require_once "Config.php";
+require_once "Settings.php";
 
 class Navigation {
 	

@@ -17,8 +17,9 @@ function IO(){
 			success: function(msg){
 				if(msg.slice(0,6) == "Ошибка"){
 					msg = "<font color='red'>"+msg+"</font>";
-				}				
-				display.prepend(msg+"<br>");				
+				}
+				display.find("div").removeClass("response");				
+				display.prepend("<div class='response'>"+msg+"</div><br>");				
 				var jstry = new JSTry();
 				jstry.perform(msg);
 			}			

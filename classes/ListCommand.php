@@ -1,31 +1,24 @@
 <?php
-require_once "Settings.php";
-require_once "HardDrive.php";
-require_once "Navigation.php";
-require_once "User.php";
-require_once "OS.php";
+require_once "Draenor.php";
 
-class ListCommand {
+class ListCommand extends Draenor{
 	private $allInfo;
 	private $Settings;	
 	private $desc;
-	private $hd;
-	private $nav;
-	private $user;
-	private $os;
 	
-	function __construct($command){
+	
+	function __construct(){
+		// code
+	}
+
+	function init($command){
 		$this->allInfo = $command;
-		$this->desc = $command['desc'];
-		$this->hd = new HardDrive();
-		$this->nav = new Navigation();
-		$this->user = new User();
-		$this->os = new OS();
+		$this->desc = $command['desc'];				
 	}
 	
 	// Общее дискоквое пространство
 	function os_wds(){		
-		return $this->desc." : ".Settings::DISK_SPACE;
+		return $this->desc." : ".$this->settings->disk_space;
 	}
 	
 	// Очистить окно дисплея консоли
@@ -43,7 +36,7 @@ class ListCommand {
 		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
 			echo "Ошибка! Не указано имя файла";
 		}else{
-			//
+			return $this->desc." : ".$this->os->createNode("U","F", $this->allInfo[1], $this->nav->whereIam("id"));
 		}
 	}
 	
@@ -63,7 +56,7 @@ class ListCommand {
 	}
 
 	function os_wcluster_size(){
-		return $this->desc." : ".Settings::CLUSTER_SPACE;		
+		return $this->desc." : ".$this->settings->cluster_space;		
 	}
 
 	function os_wos_init(){
@@ -80,7 +73,7 @@ class ListCommand {
 		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
 			echo "Ошибка! Не указано имя каталога";			
 		}else{
-			return $this->desc." : ".$this->os->createNode("U", "D", $this->allInfo[1], $this->nav->whereIam("id"));			
+			return $this->os->createNode("U", "D", $this->allInfo[1], $this->nav->whereIam("id"));			
 		}
 	}
 
@@ -105,7 +98,7 @@ class ListCommand {
 		$parent_dir_id = $this->nav->whereIam("id");
 		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
 			echo "Ошибка! Не указано имя каталогя для перехода";
-		}else{
+		}else{			
 			$dirs = $this->hd->showWhatInDir($parent_dir_id, "dirs");		
 			return $this->os->moveToDir($this->allInfo[1], $dirs);
 		}		

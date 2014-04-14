@@ -1,21 +1,16 @@
 <?php
-require_once "Bd.php";
-require_once "User.php";
-class Commands {
-	
-	private $bd;	
-	private $user;	
+require_once "Draenor.php";
+
+class Commands extends Draenor{
 	
 	function __construct(){		
-		$base = new Bd();
-		$this->bd = $base->get_connection();
-		$this->user = new User();
+		parent::__construct();
 	}
 
 	function isLogin(){		
 		if(isset($_SESSION['user_id'])){
 			return true;
-		}else{
+		}else{			
 			return false;
 		}
 	}
@@ -34,7 +29,7 @@ class Commands {
 	
 	function parseCommand($command){
 		$parts = explode(" ", $command);
-		$result = $this->bd->query("SELECT * FROM os_commands WHERE name = '$parts[0]' ");
+		$result = $this->database->link()->query("SELECT * FROM os_commands WHERE name = '$parts[0]' ");
 		if($result->num_rows == 0){
 			echo "Ошибка! Такой команды не существует!";
 		}else{
@@ -52,15 +47,14 @@ class Commands {
 		}
 	}
 	
-	function initProccess($command) {
-		require_once "ListCommand.php";
-		$list_commands = new ListCommand($command);
+	function initProccess($command) {		
 		$func = "os_".$command[0];		
-		echo $list_commands->$func();		
+		$this->lc->init($command);
+		echo $this->lc->$func();		
 	}
 
 	function get_command_desc($name){
-		$res = $this->bd->query("SELECT desc FROM os_commands WHERE name = '$name' ");
+		$res = $this->database->link()->query("SELECT desc FROM os_commands WHERE name = '$name' ");
 		$row = $res->fetch_array();
 		return $row['desc'];
 	}

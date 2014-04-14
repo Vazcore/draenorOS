@@ -101,3 +101,8 @@ article{
 	padding: 4px 10px;
 	border: 1px solid rgb(190,190,190);
 }
+
+.response{
+	background-color: lime;
+	padding: 5px;	
+}

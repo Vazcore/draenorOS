@@ -1,19 +1,7 @@
 <?php
-require_once "Settings.php";
-require_once "HardDrive.php";
-require_once "Bd.php";
-require_once "User.php";
-require_once "ListCommand.php";
-require_once "Navigation.php";
-require_once "BitMap.php";
+require_once "Draenor.php";
 
-class OS{
-	protected $bd;
-	protected $user;
-	protected $hd;
-	protected $lc;
-	protected $nav;
-	protected $bm;
+class OS extends Draenor{	
 
 	//structura
 	private $start_cluster;
@@ -21,9 +9,8 @@ class OS{
 	// end structura
 
 	function __construct(){
-		$base = new Bd();
-		$this->bd = $base->get_connection();	
-		$this->nav = new Navigation();		
+		// code
+		parent::__construct();
 	}
 
 
@@ -46,11 +33,8 @@ class OS{
 
 	function os_init(){
 		$this->start_cluster = 1;
-		$this->end_cluster = ceil(Settings::OS_SIZE/Settings::CLUSTER_SPACE);		
+		$this->end_cluster = ceil($this->settings->os_size/$this->settings->cluster_space);		
 		
-		$this->hd = new HardDrive();
-		$this->bm = new BitMap();
-
 		// Фрагментация системы и реинициализация
 		$this->hd->init();
 
@@ -62,7 +46,7 @@ class OS{
 	}
 
 	function alreadyExists($name, $parent){
-		$res = $this->bd->query("SELECT name FROM os_nodes WHERE parent = '$parent' AND name = '$name' ");	
+		$res = $this->database->link()->query("SELECT name FROM os_nodes WHERE parent = '$parent' AND name = '$name' ");	
 		if($res->num_rows != 0){
 			return true;
 		}else{
@@ -71,10 +55,7 @@ class OS{
 	}
 
 
-	function createNode($type, $file_kind, $name, $location){
-		require_once "SYSTEM_FILE.php";
-		//require_once "File.php";
-		require_once "Dir.php";
+	function createNode($type, $file_kind, $name, $location){		
 		
 		if($file_kind == "D"){
 			$f_k = "каталог";			
@@ -88,10 +69,11 @@ class OS{
 				// Проверка на существование файла(каталога)
 				if(!$this->alreadyExists($name, $location)){
 					if($file_kind == "D"){
-					// Dir
-						$ud = new Dir($name, $location);
+					// Dir						
+						$ud = $this->dir->init($name, $location);
 					}else{
-						// File
+						// File						
+						$uf = $this->fil->init($name, $location);						
 					}
 				}else{
 					return "Ошибка! С таким именем уже существует!";
@@ -105,18 +87,18 @@ class OS{
 	}
 
 	function removeDir($p_id, $dir){
-		$res = $this->bd->query("SELECT begin FROM os_nodes WHERE parent = '$p_id' AND name = '$dir' ");
+		$res = $this->database->link()->query("SELECT begin FROM os_nodes WHERE parent = '$p_id' AND name = '$dir' ");
 		$row = $res->fetch_array();
 		$cl_id = $row['begin'];
 
 
-		$res = $this->bd->query("SELECT data FROM os_clusters WHERE cluster_id = '$cl_id' ");
+		$res = $this->database->link()->query("SELECT data FROM os_clusters WHERE cluster_id = '$cl_id' ");
 		$row = $res->fetch_array();
 		if($row['data'] != "None"){
 			return "Директория не пуста!";
 		}else{
-			$res = $this->bd->query("UPDATE os_clusters SET status='free' WHERE cluster_id = '$cl_id' ");
-			$res = $this->bd->query("SELECT data FROM os_clusters WHERE cluster_id = '$p_id' ");
+			$res = $this->database->link()->query("UPDATE os_clusters SET status='free' WHERE cluster_id = '$cl_id' ");
+			$res = $this->database->link()->query("SELECT data FROM os_clusters WHERE cluster_id = '$p_id' ");
 			$row = $res->fetch_array();
 			$data = $row['data'];
 			$pos_id = strpos($data, $cl_id);
@@ -124,8 +106,8 @@ class OS{
 			for ($i=$pos_id; $i <= $pos_id+$ln; $i++) { 
 				$data[$i] = "";
 			}
-			$res = $this->bd->query("UPDATE os_clusters SET data='$data' WHERE cluster_id = '$p_id' ");
-			$res = $this->bd->query("DELETE FROM os_nodes WHERE parent = '$p_id' AND name = '$dir' ");
+			$res = $this->database->link()->query("UPDATE os_clusters SET data='$data' WHERE cluster_id = '$p_id' ");
+			$res = $this->database->link()->query("DELETE FROM os_nodes WHERE parent = '$p_id' AND name = '$dir' ");
 			return " успешно выполнено";
 		}
 
@@ -146,29 +128,38 @@ class OS{
 
 	function moveToDir($dir_to, $dirs){
 		$find_status = false;
+
 		foreach ($dirs as $key => $dir) {
 			if($dir_to == $dir['name']){
 				$find_status = true;
 				$dir_id = $dir['begin'];
+				break;
 			}
 		}
 		if(!$find_status){
 			return "Ошибка! Директория с таким названием не найдена!";
 		}else{			
 			$user_id =  $_SESSION['user_id'];
-			$this->bd->query("UPDATE os_users SET location_id='$dir_id' WHERE id = '$user_id' ");
+			$res = $this->database->link()->query("SELECT file_kind FROM os_nodes WHERE begin = '$dir_id' LIMIT 1 ");
+			$row = $res->fetch_array();
+			if($row['file_kind'] == 'D'){
+				$this->database->link()->query("UPDATE os_users SET location_id='$dir_id' WHERE id = '$user_id' ");
+				return "Совершен переход в директорию ".$dir_to;
+			}else{
+				return "Ошибка! Невозможен переход по файлу!";
+			}
 		}
 	}
 
 	function moveBack($d_id){
-		$res = $this->bd->query("SELECT parent FROM os_nodes WHERE begin = '$d_id' ");	
+		$res = $this->database->link()->query("SELECT parent FROM os_nodes WHERE begin = '$d_id' ");	
 		$row = $res->fetch_array();
 		if($row['parent'] == 0){
 			return "Ошибка! Вы находитесь в корневой директории!";
 		}else{
 			$p_id = $row['parent'];
 			$user_id =  $_SESSION['user_id'];
-			$this->bd->query("UPDATE os_users SET location_id='$p_id' WHERE id = '$user_id' ");	
+			$this->database->link()->query("UPDATE os_users SET location_id='$p_id' WHERE id = '$user_id' ");	
 			return "Вы успешно переместились в директорию - ".$this->nav->whereIam();
 		}
 	}

@@ -1,24 +1,22 @@
 <?php
-require_once "Bd.php";
-require_once "Settings.php";
+require_once "Draenor.php";
 
-class BitMap{
+class BitMap extends Draenor{
 	private $bd;
 
 	function __construct(){
-		$base = new Bd();
-		$this->bd  = $base->get_connection();
+		// code
 	}
 
 	function getCluster($type){
 		if($type == "S"){
 			$from_cluster = 1;
-			$s_clusters = ceil(Settings::OS_SIZE/Settings::CLUSTER_SPACE);
+			$s_clusters = ceil($this->settings->os_size/$this->settings->cluster_space);
 		}else{
-			$from_cluster = ceil(Settings::OS_SIZE/Settings::CLUSTER_SPACE) + 1;			
-			$s_clusters = ceil(Settings::DISK_SPACE/Settings::CLUSTER_SPACE);			
+			$from_cluster = ceil($this->settings->os_size/$this->settings->cluster_space) + 1;			
+			$s_clusters = ceil($this->settings->disk_space/$this->settings->cluster_space);			
 		}		
-		$res = $this->bd->query("SELECT * FROM os_clusters WHERE (type = '$type' AND (cluster_id BETWEEN $from_cluster AND $s_clusters)) AND status = 'free' ");
+		$res = $this->database->link()->query("SELECT * FROM os_clusters WHERE (type = '$type' AND (cluster_id BETWEEN $from_cluster AND $s_clusters)) AND status = 'free' ");
 		if($res->num_rows == 0){
 			return false;
 		}else{

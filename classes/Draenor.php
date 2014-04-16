@@ -11,7 +11,7 @@ class Draenor{
 		"lc"       => "ListCommand",
 		"nav"      => "Navigation",
 		"settings" => "Settings",
-		"system"   => "SYSTEM_FILE",
+		"sf"       => "SYSTEM_FILE",
 		"user"     => "User",
 		"fil"	   => "Fil"	 
 	);

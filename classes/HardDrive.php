@@ -25,7 +25,7 @@ class HardDrive extends Draenor{
 	
 	
 	function get_total_clusters() {
-		return $this->settings->disk_space/$this->settings->cluster_space;
+		return ($this->settings->disk_space/$this->settings->cluster_space);
 	}
 	
 	function get_free_space(){
@@ -84,5 +84,6 @@ class HardDrive extends Draenor{
 		}		
 
 	}
+	
 }
 ?>

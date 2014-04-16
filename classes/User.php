@@ -24,7 +24,7 @@ class User extends Draenor{
 	}
 
 	function getUser($id){		
-			$res = $this->database->link()->query("SELECT name, role, location_id FROM os_users WHERE id = '$id' ");
+			$res = $this->database->link()->query("SELECT name, home, role, location_id FROM os_users WHERE id = '$id' ");
 			$row = $res->fetch_array();
 		
 		return $row;
@@ -44,13 +44,19 @@ class User extends Draenor{
 					$this->user_name = $row['name'];
 					$this->user_role = $row['role'];
 					$this->user_loc = $row['location_id'];				
-					$res = $this->database->link()->query("UPDATE os_users SET status = '1', location_id = '$homeDir' WHERE id = '$this->user_id' ");
+					$user_desktop = $row['home'];
+					$res = $this->database->link()->query("UPDATE os_users SET status = '1', location_id = '$user_desktop' WHERE id = '$this->user_id' ");
+					echo "Добро пожаловать, ".$this->user_name;
 					return $this->user_name;
 				}else{
-					return false;
+					echo "Ошибка! Комбинация имя пользователя и пароль - не совпадают!";
 				}				
 			}else{
-				return false;
+				echo "Ошибка! Введите имя пользователя и пароль!";
+			}
+		}else{
+			if($command == "wlogin"){
+				echo "Введите имя пользователя и пароль!";	
 			}
 		}	
 		
@@ -60,6 +66,38 @@ class User extends Draenor{
 		$res = $this->database->link()->query("UPDATE os_users SET status = '0' WHERE id = '$this->user_id' ");
 		unset($_SESSION['user_id']);
 		session_destroy();		
+	}
+
+	function createHomeDir($name, $location){
+		$id = $this->bm->getCluster("U");
+
+		$date = date("d-m-Y");
+		$type = "U";
+		$file_kind = "RD";
+		$access = "7-5-5";
+		$user_id = $_SESSION['user_id'];
+
+		if($id){
+			$atrs = array($name,$location,($id+0), $date, $type, $file_kind, $access);
+			$size = $this->os->calcSize($atrs);
+
+			$this->database->link()->query("INSERT INTO os_nodes (type,file_kind,access,begin,size,name,parent,date,creator) VALUES ('$type','$file_kind','$access','$id', '$size','$name',$location,'$date','$user_id') ");
+			$this->database->link()->query("UPDATE os_clusters SET type = '$type', status='busy' WHERE cluster_id='$id' ");
+
+			if($location != "0" && $location != "-1"){
+				$res = $this->database->link()->query("SELECT data FROM os_clusters WHERE cluster_id = '$location' ");
+				$row = $res->fetch_array();
+				if($row['data'] == "None"){
+					$path = $id;
+				}else{
+					$path = $row['data'].";".$id;
+				}
+				$this->database->link()->query("UPDATE os_clusters SET data = '$path' WHERE cluster_id='$location' ");
+				return $id;
+			}
+		}else{
+			return "Ошибка! Нет места на диске!";
+		}
 	}
 }
 ?>

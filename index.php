@@ -9,7 +9,7 @@
 		<script src="js/jquery.js" type="text/javascript" language="javascript"></script>	
 		<script src="js/JSTry.js" type="text/javascript" language="javascript"></script>
 		<script src="js/input_output.js" type="text/javascript" language="javascript"></script>
-		<script src="js/actions.js" type="text/javascript" language="javascript"></script>
+		<script src="js/actions.js" type="text/javascript" language="javascript"></script>		
 	</head>
 	<body>
 		<div id="main">

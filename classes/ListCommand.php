@@ -62,9 +62,9 @@ class ListCommand extends Draenor{
 	function os_wos_init(){
 		$role = $this->user->getUserInfo();
 		if($role['role'] != "Admin"){
-			echo "Отказано в доступе!";
+			return "Ошибка! Отказано в доступе!";
 		}else{
-			$this->os->os_init();
+			return $this->desc.":".$this->os->os_init();
 		}
 	}
 
@@ -88,7 +88,7 @@ class ListCommand extends Draenor{
 	}
 
 	// Просмотр содержимвого директории
-	function os_wls(){
+	function os_wls(){		
 		$dir_id = $this->nav->whereIam("id");
 		return $this->desc."<font color='green'>".$this->nav->whereIam()."</font> : ".$this->hd->showWhatInDir($dir_id);
 	}
@@ -107,6 +107,27 @@ class ListCommand extends Draenor{
 	function os_wgoback(){
 		$local_dir_id = $this->nav->whereIam("id");
 		return $this->os->moveBack($local_dir_id);
+	}
+
+	function os_wof(){
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
+			echo "Ошибка! Не указано имя файла для открытия";
+			return false;
+		}else{
+			$local_dir_id = $this->nav->whereIam("id");			
+			return $this->desc.":".$this->os->open_file($this->allInfo[1], $local_dir_id);
+		}		
+	}
+
+	function os_wadduser(){
+		if(!isset($this->allInfo[2]) OR trim($this->allInfo[2]) == ""){
+			return "Ошибка! Не указан пароль для пользователя!";			
+		}			
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
+			return "Ошибка! Не указано имя пользователя!";			
+		}else{
+			return $this->desc.":".$this->os->addUser($this->allInfo[1], $this->allInfo[2]);
+		}					
 	}
 
 }

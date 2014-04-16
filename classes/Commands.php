@@ -19,11 +19,7 @@ class Commands extends Draenor{
 		if($this->isLogin()){
 			$readyCommand = $this->parseCommand($command);				
 		}else{
-			if(!$name = $this->user->login_user($command)){				
-				echo "Войдите в систему (команда wlogin)";
-			}else{
-				echo "Добро пожаловать, ".$name;
-			}			
+			return $this->user->login_user($command);
 		}
 	}
 	

@@ -1,46 +1,43 @@
 <?php
 
-require_once "OS.php";
-require_once "Bd.php";
-require_once "BitMap.php";
+require_once "Draenor.php";
 
-	class SYSTEM_FILE{
-		private $os;
+class SYSTEM_FILE extends Draenor{
+		
+	private $name;
+	private $date;
+	private $parent;
+	private $begin;
 
-		private $name;
-		private $date;
-		private $parent;
-		private $begin;
+	function __construct(){
+		// code
+		parent::__construct();
+	}
 
-		function __construct($name, $parent){
-			$this->os = new OS();
-			$base = new Bd();
-			$this->bd  = $base->get_connection();
+	function init($name, $parent){
+		
+		$id = $this->bm->getCluster("S");
+		
+		if($id){
+			$this->name = $name;
+			$this->parent = $parent;
+			$this->date = date("d-m-Y");
+			$this->begin = $id;
+			$type = "S";
+			$file_kind = "F";
+			$access = "0-0-0";
+			$user_id = $_SESSION['user_id'];
 
-			$bm = new BitMap();
+			echo "INIT";
+			$atrs = array($name,$parent,($id+0), $this->date, $type, $file_kind, $access);
+			$size = $this->os->calcSize($atrs);
 
-			$id = $bm->getCluster("S");
-			
-			if($id){
-				$this->name = $name;
-				$this->parent = $parent;
-				$this->date = date("d-m-Y");
-				$this->begin = $id;
-				$type = "S";
-				$file_kind = "F";
-				$access = "0-0-0";
-				$user_id = $_SESSION['user_id'];
-
-
-				$atrs = array($name,$parent,($id+0), $this->date, $type, $file_kind, $access);
-
-				$size = $this->os->calcSize($atrs);
-
-				$this->bd->query("INSERT INTO os_nodes (type,file_kind,access,begin,size,name,parent,date,creator) VALUES ('S','F','0-0-0','$id', '$size','$name', $parent, '$this->date','$user_id') ");
-				$this->bd->query("UPDATE os_clusters SET type = 'S', status='busy' WHERE cluster_id='$id' ");
-			}else{
-				echo "Ошибка! Нет места на диске!";
-			}
+			$this->database->link()->query("INSERT INTO os_nodes (type,file_kind,access,begin,size,name,parent,date,creator) VALUES ('S','F','0-0-0','$id', '$size','$name', $parent, '$this->date','$user_id') ");
+			$this->database->link()->query("UPDATE os_clusters SET type = 'S', status='busy' WHERE cluster_id='$id' ");
+		}else{
+			echo "Ошибка! Нет места на диске!";
 		}
 	}
+}
+
 ?>

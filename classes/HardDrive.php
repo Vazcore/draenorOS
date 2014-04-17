@@ -11,7 +11,12 @@ class HardDrive extends Draenor{
 		// Очистка БД таблиц
 		$this->database->link()->query("TRUNCATE TABLE os_clusters");
 		$this->database->link()->query("TRUNCATE TABLE os_nodes");
+		$this->database->link()->query("TRUNCATE TABLE os_users");
 		// End truncate
+
+		$home_dir = $this->get_home_dir();
+
+		$this->database->link()->query("INSERT INTO os_users (name,pass,role,home,location_id,status) VALUES ('Alexey','1234','Admin','0','$home_dir','0')");
 
 		for ($i=1; $i <= $this->get_total_clusters(); $i++) { 
 			if($i <= ceil($this->settings->os_size/$this->settings->cluster_space)){
@@ -60,10 +65,17 @@ class HardDrive extends Draenor{
 		if($res->num_rows != 0){
 			while($row = $res->fetch_array()){
 				$dirs[] = $row;
+				if($row['file_kind'] == "D"){
+					$definition = "blue";
+				}elseif($row['file_kind'] == "RD"){
+					$definition = "dark";
+				}else{
+					$definition = "red";
+				}
 				$add_html = '
 					<tr>
 						<td>'.$row['begin'].'</td>
-						<td>'.$row['name'].'</td>
+						<td><font color="'.$definition.'"><b>'.$row['name'].'</b></font></td>
 						<td>'.$row['size'].'</td>
 						<td>'.$row['date'].'</td>
 						<td>'.$row['access'].'</td>

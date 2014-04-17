@@ -13,6 +13,7 @@ body{
 	margin: 0 auto;
 	font-family: Tahoma;
 	font-size: 12px;
+	position: relative;
 }
 
 header{
@@ -107,12 +108,72 @@ article{
 	padding: 5px;	
 }
 
-#file_form_cover textarea{
+#window_dark{
+	visibility: hidden;
+	width: 100%;
+	height: 100%;
+	background-color: silver;
+	opacity: 0.5;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100;
+}
+
+.start_window_dark{
+	visibility: visible !important;
+}
+
+#file_window{
+	visibility: hidden;
+	position: absolute;
+	left: 10%;
+	top: 20%;
+	width: 80%;
+	background-color: white;
+	border: 1px solid black;
+	border-radius: 5px;
+	z-index: 101;	
+	padding-bottom: 20px;		
+}
+
+.start_file_window{
+	visibility: visible !important;
+}
+
+#file_name{
+	padding-left: 30px;
+}
+
+#file_work_space{
 	width: 90%;
 	min-width: 90%;
 	max-width: 90%;
-	height: 140px;
-	min-height: 140px;
-	max-height: 140px;
+	height: 400px;
+	min-height: 400px;
+	max-height: 400px;	
+	margin-left: 28px;
+	padding: 5px;
+}
 
+.close{
+	position: absolute;
+	top: 10px;
+	right: 30px;
+	width: 25px;
+	height: 25px;
+	background-image: url("../img/close.png");
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+
+.save{
+	position: absolute;
+	top: 10px;
+	right: 80px;
+	width: 25px;
+	height: 25px;
+	background-image: url("../img/save.png");
+	background-repeat: no-repeat;
+	cursor: pointer;	
 }

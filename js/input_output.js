@@ -17,6 +17,9 @@ function IO(){
 			success: function(msg){
 				if(msg.indexOf("Ошибка!") != -1){
 					msg = "<font color='#C80000'><b>"+msg+"</b></font>";
+				}else if(msg.indexOf("Draenor - open file") != -1){
+					var draenor_file = new Fil();
+					draenor_file.openFile(msg);
 				}
 				$("#file_form_cover").html("");
 				display.find("div").removeClass("response");				

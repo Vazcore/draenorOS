@@ -40,22 +40,7 @@ class Fil extends Draenor{
 		}
 	}
 
-	function open_file_form($f_data, $f_name, $cluster_id){
-		$html = '
-		<script type="text/javascript">
-			$("#send_f_data").click(function() {
-				var text1 =  $("#data_area").text();
-				alert(text1);
-			});
-		</script>
-		<div id="file_form_cover">
-			<h4>Файл - '.$f_name.'</h4>
-			<input type="hidden" value="'.$cluster_id.'">
-			<textarea id="data_area">'.$f_data.'</textarea>
-			<br>
-			<button id="send_f_data">Записать в файл</button>
-		</div>
-		';
-		return $html;
+	function open_file_form(){
+		
 	}
 }

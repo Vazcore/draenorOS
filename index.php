@@ -10,9 +10,15 @@
 		<script src="js/JSTry.js" type="text/javascript" language="javascript"></script>
 		<script src="js/input_output.js" type="text/javascript" language="javascript"></script>
 		<script src="js/actions.js" type="text/javascript" language="javascript"></script>		
+		<script src="js/Fil.js" type="text/javascript" language="javascript"></script>		
 	</head>
 	<body>
 		<div id="main">
+			<!-- Модули окон -->
+			<?php
+				include_once "blocks/file_window.php";
+			 ?>
+			<!-- End Модули окон -->
 			<header>
 				<div id="sitename">
 					<h1>Операционная система Draenor</h1>

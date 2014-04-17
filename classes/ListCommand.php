@@ -87,7 +87,7 @@ class ListCommand extends Draenor{
 		}		
 	}
 
-	// Просмотр содержимвого директории
+	// Просмотр содержимого директории
 	function os_wls(){		
 		$dir_id = $this->nav->whereIam("id");
 		return $this->desc."<font color='green'>".$this->nav->whereIam()."</font> : ".$this->hd->showWhatInDir($dir_id);

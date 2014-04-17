@@ -72,6 +72,7 @@ class OS extends Draenor{
 					if($file_kind == "D"){
 					// Dir						
 						$ud = $this->dir->init($name, $location);
+						return $ud;
 					}elseif($file_kind == "RD"){
 						// Домашняя директория пользователя
 						$urd = $this->user->createHomeDir($name, $location);
@@ -79,6 +80,7 @@ class OS extends Draenor{
 					}else{
 						// File						
 						$uf = $this->fil->init($name, $location);						
+						return $uf;
 					}
 				}else{
 					return "Ошибка! С таким именем уже существует!";
@@ -125,7 +127,7 @@ class OS extends Draenor{
 			if(is_numeric($value)){
 				$size = $size + 4;
 			}else{
-				$size = $size + iconv_strlen($value);
+				$size = $size + mb_strlen($value);
 			}
 		}
 		return $size;
@@ -177,14 +179,14 @@ class OS extends Draenor{
 		}
 	}
 
-	private function get_file_data($begin_cluster){
-		$file_data = "Пустой файл";
+	function get_file_data($begin_cluster){
+		$file_data = " ";
 		$cluster = $begin_cluster;
 		while ($cluster != 0) {
 			$res = $this->database->link()->query("SELECT * FROM os_clusters WHERE cluster_id = '$cluster' LIMIT 1 ");
 			$row = $res->fetch_array();
-			if($row['data'] != "None"){
-				$file_data = $row['data'];			
+			if($row['data'] != "None"){				
+				$file_data = $file_data.$row['data'];			
 			}
 			$cluster = $row['link'];
 		}
@@ -195,16 +197,56 @@ class OS extends Draenor{
 		$res = $this->database->link()->query("SELECT * FROM os_nodes WHERE parent = '$location_id' AND name = '$f_name' AND file_kind = 'F' LIMIT 1 ");
 		if($res->num_rows != 0){			
 			$row = $res->fetch_array();
-			$begin_cluster = $row['begin'];
-			$file_data = $this->get_file_data($begin_cluster);
-			return $this->fil->open_file_form($file_data, $f_name, $begin_cluster);
+			$begin_cluster = $row['begin'];			
+			return ("Draenor - open file! Открытие файла ***".$f_name."$$$".$begin_cluster);
 		}else{
 			return "Ошибка! Нет такого файла!";
 		}		
 	}
 
+	function separate_data_to_cluster($data){
+		$clusters = array();
+		$size = $this->calcSize(array($data));
+		$count = ceil($size/$this->settings->cluster_space);
+		$pred_pos = 0;
+		for ($i=1; $i < $count; $i++) { 
+			$pos = strpos($data, " ", $i*$this->settings->cluster_space);
+			$clusters[$i] = mb_substr($data, $pred_pos, $pos);
+			$pred_pos = $pos;
+		}
+		return $clusters;
+	}
+
 	function write_to_file($data, $cluster_id){
-		$res = $this->database->link()->query("UPDATE os_clusters SET data = '$data' WHERE cluster_id = '$cluster_id' ");
+		$cluster_id = intval($cluster_id);
+		$cluster = $cluster_id;
+		$atrs = array($data);
+		$size = $this->calcSize($atrs);
+		$status_cluster = "Old";
+
+		if($size <= $this->settings->cluster_space){
+			$res = $this->database->link()->query("UPDATE os_clusters SET data = '$data' WHERE cluster_id = '$cluster_id' ");	
+		}else{
+			$clusters = $this->separate_data_to_cluster($data);
+			foreach ($clusters as $key => $clust) {
+				if($status_cluster == "Old"){
+					$res = $this->database->link()->query("UPDATE os_clusters SET data = '$clust' WHERE cluster_id = '$cluster' ");						
+					$res = $this->database->link()->query("SELECT * FROM os_clusters WHERE cluster_id = '$cluster' LIMIT 1 ");
+					$row = $res->fetch_array();
+					$cluster = $row['link'];
+					if($cluster == 0){
+						$status_cluster = "New";
+						$cluster = $row['cluster_id'];
+					}					
+				}else{
+					$free_cluster = $this->bm->getCluster("U");										
+					$res = $this->database->link()->query("UPDATE os_clusters SET link = '$free_cluster' WHERE cluster_id = '$cluster' ");
+					$this->database->link()->query("UPDATE os_clusters SET status='busy', data='$clust' WHERE cluster_id = '$free_cluster' ");
+					$cluster = $free_cluster;
+				}
+			}
+		}
+		
 	}
 
 	function addUser($name, $pass){

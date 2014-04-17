@@ -10,8 +10,10 @@ class Dir extends Draenor{
 	}
 
 	function init($name,$location){
+		if($location == $this->hd->get_home_dir()){
+			return "Ошибка! Запрещено создание каталогов в корневой директории системы!";
+		}
 		$id = $this->bm->getCluster("U");
-
 		$date = date("d-m-Y");
 		$type = "U";
 		$file_kind = "D";

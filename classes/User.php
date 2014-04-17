@@ -57,6 +57,8 @@ class User extends Draenor{
 		}else{
 			if($command == "wlogin"){
 				echo "Введите имя пользователя и пароль!";	
+			}else{
+				echo "Требуется пройти процесс авторизации пользователя!";
 			}
 		}	
 		

@@ -16,7 +16,11 @@
 		<div id="main">
 			<!-- Модули окон -->
 			<?php
+				// Окно файла
 				include_once "blocks/file_window.php";
+
+				// Окно списка команд
+				include_once "blocks/list_commands.php";				
 			 ?>
 			<!-- End Модули окон -->
 			<header>
@@ -36,7 +40,10 @@
 				</div>				
 			</header>			
 			<article>
-				<h3>Консоль ОС</h3>
+				<div id="help_panel">
+					<h3>Консоль ОС</h3>				
+					<div id="options">Список команд</div>
+				</div>
 				<hr>				
 				<div id="console">
 					<div id="cosnoleDisplay"></div>

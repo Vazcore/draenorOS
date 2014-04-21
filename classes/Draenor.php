@@ -13,7 +13,8 @@ class Draenor{
 		"settings" => "Settings",
 		"sf"       => "SYSTEM_FILE",
 		"user"     => "User",
-		"fil"	   => "Fil"	 
+		"fil"	   => "Fil",
+		"help"     => "Help"	 
 	);
 
 	private static $objects = array();

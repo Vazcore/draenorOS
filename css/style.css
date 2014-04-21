@@ -177,3 +177,41 @@ article{
 	background-repeat: no-repeat;
 	cursor: pointer;	
 }
+
+#list_commands_cover{
+	position: absolute;
+	top: 190px;
+	right: -100px;
+	border: 1px solid silver;
+	border-radius: 5px;
+	width: 400px;
+	height: 300px;
+	background-color: white;
+	overflow: scroll;
+	visibility: hidden;
+}
+
+.show_list_commands_cover{
+	visibility: visible !important;
+}
+
+#help_panel{
+	overflow: hidden;
+}
+
+#help_panel h3{
+	float: left;
+}
+
+#help_panel div{
+	float: right;
+	margin-top: 15px;
+	padding-right: 10px;
+	font-weight: bold;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+#list_commands_cover table{
+	border-collapse: collapse;
+}

@@ -127,7 +127,7 @@ class OS extends Draenor{
 			if(is_numeric($value)){
 				$size = $size + 4;
 			}else{
-				$size = $size + mb_strlen($value);
+				$size = $size + mb_strlen($value, 'UTF-8');
 			}
 		}
 		return $size;
@@ -207,46 +207,140 @@ class OS extends Draenor{
 	function separate_data_to_cluster($data){
 		$clusters = array();
 		$size = $this->calcSize(array($data));
-		$count = ceil($size/$this->settings->cluster_space);
-		$pred_pos = 0;
-		for ($i=1; $i < $count; $i++) { 
-			$pos = strpos($data, " ", $i*$this->settings->cluster_space);
-			$clusters[$i] = mb_substr($data, $pred_pos, $pos);
-			$pred_pos = $pos;
-		}
+		$count = ceil($size/$this->settings->cluster_space);		
+		
+		for ($i=1; $i <= $count; $i++) { 			
+			$clusters[$i] = mb_substr($data, (($i*$this->settings->cluster_space)-$this->settings->cluster_space), ($this->settings->cluster_space), 'UTF-8');
+		}		
+		
 		return $clusters;
 	}
 
-	function write_to_file($data, $cluster_id){
-		$cluster_id = intval($cluster_id);
-		$cluster = $cluster_id;
-		$atrs = array($data);
-		$size = $this->calcSize($atrs);
-		$status_cluster = "Old";
+	function write_to_file($data, $f_begin){
 
-		if($size <= $this->settings->cluster_space){
-			$res = $this->database->link()->query("UPDATE os_clusters SET data = '$data' WHERE cluster_id = '$cluster_id' ");	
-		}else{
-			$clusters = $this->separate_data_to_cluster($data);
-			foreach ($clusters as $key => $clust) {
-				if($status_cluster == "Old"){
-					$res = $this->database->link()->query("UPDATE os_clusters SET data = '$clust' WHERE cluster_id = '$cluster' ");						
-					$res = $this->database->link()->query("SELECT * FROM os_clusters WHERE cluster_id = '$cluster' LIMIT 1 ");
-					$row = $res->fetch_array();
-					$cluster = $row['link'];
-					if($cluster == 0){
-						$status_cluster = "New";
-						$cluster = $row['cluster_id'];
-					}					
-				}else{
-					$free_cluster = $this->bm->getCluster("U");										
-					$res = $this->database->link()->query("UPDATE os_clusters SET link = '$free_cluster' WHERE cluster_id = '$cluster' ");
-					$this->database->link()->query("UPDATE os_clusters SET status='busy', data='$clust' WHERE cluster_id = '$free_cluster' ");
-					$cluster = $free_cluster;
+		// Разделение данных по кластерам
+		$clusters_data = $this->separate_data_to_cluster($data);
+
+		// Количество циклов заполнения каждого кластера
+		$count_clusters = count($clusters_data);
+
+		// Определение линка обращения к кластерам и ID самого кластера
+		$link = $f_begin;
+		$cluster = $f_begin;
+
+
+		// Цикл записи данных в кластера
+		for ($i=1; $i <= $count_clusters; $i++) { 
+
+			// Текущая порция данных в кластер			
+			$data_per_cluster = trim($clusters_data[$i]);
+
+			// Условие проверки на выделение в памяти нового кластера (либо запись в существующий)
+			if($link == 0){
+				$new_link = $this->bm->getCluster("U");
+				if(!$new_link){
+					return "Ошибка! Недостаточно памяти!";
 				}
+
+				// Запись данных по новому линку
+				$this->database->link()->query("UPDATE os_clusters SET status = 'busy', data = '$data_per_cluster' WHERE cluster_id = '$new_link' LIMIT 1 ");
+
+				// Обновление линка предыдущего кластера
+				$this->database->link()->query("UPDATE os_clusters SET link = '$new_link' WHERE cluster_id = '$cluster' LIMIT 1 ");
+
+				// переопределение текущего кластера и обнуление линка (так как он новый и не может ссылаться на другой кластер)
+				$cluster = $new_link;
+				$link = 0;
+
+				continue;
+
+			}else{
+
+				// Определение следующего линка для обращения (если он имеется)				
+				$res = $this->database->link()->query("SELECT link FROM os_clusters WHERE cluster_id = '$link' ");
+				$row = $res->fetch_array();
+
+				// Запись данных текущего кластера
+				$this->database->link()->query("UPDATE os_clusters SET status = 'busy', data = '$data_per_cluster' WHERE cluster_id = '$link' LIMIT 1 ");
+
+				// Определение предыдущего кластера
+				$cluster = $link;
+
+				// переопределение текущего кластера (линка)
+				$link = $row['link'];
+
+				continue;
 			}
 		}
+
+		// Обнуляем линк крайнего записанного кластера в случае уменьшения записанных данных в сравнении с предыдущей записью
+		if($cluster != 0){
+			$this->database->link()->query("UPDATE os_clusters SET link = '0' WHERE cluster_id = '$cluster' ");			
+		}
+
+		// Получение информации о предыдущем размере файла
+			$res = $this->database->link()->query("SELECT size FROM os_nodes WHERE begin = '$f_begin' ");
+			$row = $res->fetch_array();
+			$pred_size = $row['size'];
+
+			// Обновление информации о размере файла в таблице узлов Nodes
+			$f_size = $this->calcSize(array($data));
+			$this->database->link()->query("UPDATE os_nodes SET size = '$f_size' WHERE begin = '$f_begin' LIMIT 1 ");
+
+			// Очищаем кластеры в случае уменьшения данных
+			if(ceil($f_size/$this->settings->cluster_space) < ceil($pred_size/$this->settings->cluster_space)){
+				$this->cleanSpace($link);
+			}
+	}
+
+	function cleanSpace($start_clean_id){
+
+		// Чистим кластеры пока существует линк
+		$link = $start_clean_id;
+
+		while($link != 0){
+
+			// Получаем линк на следующий кластер
+			$res = $this->database->link()->query("SELECT link FROM os_clusters WHERE cluster_id = '$link' ");
+			$row = $res->fetch_array();
+
+			// Чистим текущий кластер
+			$this->database->link()->query("UPDATE os_clusters SET link = '0', status = 'free', data = 'None' WHERE cluster_id = '$link' LIMIT 1 ");
+
+			// Переназначаем линк на следующий кластер
+			$link = $row['link'];
+		}
+
+	}
+
+	function delFile($f_name, $f_location){
 		
+		// определения начала кластера файла $f_begin
+		$res = $this->database->link()->query("SELECT begin FROM os_nodes WHERE parent = '$f_location' AND name = '$f_name' LIMIT 1 ");
+		$row = $res->fetch_array();
+		$f_begin = $row['begin'];
+
+		// Удаление всех кластеров, выделенных под файл циклически через линк на файл
+		$link = $f_begin;
+		while ($link != 0) {
+			// Определение нового линка на следующий кластер
+			$res = $this->database->link()->query("SELECT link FROM os_clusters WHERE cluster_id = '$link' LIMIT 1 ");	
+			$row = $res->fetch_array();
+
+			// Освобождение кластера
+			$this->database->link()->query("UPDATE os_clusters SET link = '0', status = 'free', data = 'None' WHERE cluster_id = '$link' ");
+
+			// Переопределение нового линка
+			$link = intval($row['link']);
+		}
+
+		// Удаление информации из таблицы Nodes
+		$del_res  = $this->database->link()->query("DELETE FROM os_nodes WHERE parent = '$f_location' AND name = '$f_name' LIMIT 1 ");
+
+		if($del_res){
+			return " Файл ".$f_name." успешно удален!";
+		}
+
 	}
 
 	function addUser($name, $pass){

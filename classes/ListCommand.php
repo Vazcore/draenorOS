@@ -88,7 +88,7 @@ class ListCommand extends Draenor{
 	}
 
 	// Просмотр содержимого директории
-	function os_wls(){		
+	function os_wls(){				
 		$dir_id = $this->nav->whereIam("id");
 		return $this->desc."<font color='green'>".$this->nav->whereIam()."</font> : ".$this->hd->showWhatInDir($dir_id);
 	}
@@ -128,6 +128,15 @@ class ListCommand extends Draenor{
 		}else{
 			return $this->desc.":".$this->os->addUser($this->allInfo[1], $this->allInfo[2]);
 		}					
+	}
+
+	function os_wdelf(){
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
+			return "Ошибка! Не указано имя файла для открытия";
+		}else{
+			$local_dir_id = $this->nav->whereIam("id");
+			return $this->desc.":".$this->os->delFile($this->allInfo[1], $local_dir_id);
+		}
 	}
 
 }

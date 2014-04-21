@@ -32,7 +32,7 @@ class Fil extends Draenor{
 				$data_column = $row['data'].";".$free_cluster;
 			}
 			$this->database->link()->query("UPDATE os_clusters SET data = '$data_column' WHERE cluster_id = '$location_id' ");			
-			echo "Файл ".$name."txt успешно создан!";
+			echo "Файл ".$name.".txt успешно создан!";
 			return true;
 		}else{
 			echo "Ошибка! Нет места на диске!";

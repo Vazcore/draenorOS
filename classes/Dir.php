@@ -9,8 +9,9 @@ class Dir extends Draenor{
 		parent::__construct();
 	}
 
-	function init($name,$location){
-		if($location == $this->hd->get_home_dir()){
+	function init($name,$location){		
+		$role = $this->user->getUserInfo()['role'];
+		if($location == $this->hd->get_home_dir() AND $role != 'Admin'){
 			return "Ошибка! Запрещено создание каталогов в корневой директории системы!";
 		}
 		$id = $this->bm->getCluster("U");
@@ -34,6 +35,7 @@ class Dir extends Draenor{
 					$path = $row['data'].";".$id;
 				}
 				$this->database->link()->query("UPDATE os_clusters SET data = '$path' WHERE cluster_id='$location' ");
+				return " Директория ".$name." успешно создана!";
 			}
 		}else{
 			echo "Ошибка! Нет места на диске!";

@@ -11,6 +11,7 @@
 		<script src="js/input_output.js" type="text/javascript" language="javascript"></script>
 		<script src="js/actions.js" type="text/javascript" language="javascript"></script>		
 		<script src="js/Fil.js" type="text/javascript" language="javascript"></script>		
+		<script src="js/Proccess.js" type="text/javascript" language="javascript"></script>		
 	</head>
 	<body>
 		<div id="main">
@@ -20,7 +21,10 @@
 				include_once "blocks/file_window.php";
 
 				// Окно списка команд
-				include_once "blocks/list_commands.php";				
+				include_once "blocks/list_commands.php";		
+
+				// Окно процессов
+				include_once "blocks/process.php";
 			 ?>
 			<!-- End Модули окон -->
 			<header>
@@ -43,6 +47,7 @@
 				<div id="help_panel">
 					<h3>Консоль ОС</h3>				
 					<div id="options">Список команд</div>
+					<div id="process">Процессы</div>
 				</div>
 				<hr>				
 				<div id="console">

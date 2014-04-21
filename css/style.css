@@ -191,7 +191,7 @@ article{
 	visibility: hidden;
 }
 
-.show_list_commands_cover{
+.show_window{
 	visibility: visible !important;
 }
 
@@ -215,3 +215,22 @@ article{
 #list_commands_cover table{
 	border-collapse: collapse;
 }
+
+#process_cover{
+	position: absolute;
+	top: 190px;
+	right: -100px;
+	border: 1px solid silver;
+	border-radius: 5px;
+	width: 400px;
+	height: 300px;
+	background-color: white;
+	overflow: scroll;
+	padding: 5px;
+	visibility: hidden;
+}
+
+#process_cover table{
+	border-collapse: collapse;
+}
+

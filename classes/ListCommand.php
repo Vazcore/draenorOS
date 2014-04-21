@@ -139,5 +139,17 @@ class ListCommand extends Draenor{
 		}
 	}
 
+	/*
+	*  ПРОЦЕССЫ
+	*/
+
+	function os_wcrpr(){
+		return $this->desc.":".$this->proc->createProcess();
+	}
+
+	function os_wkillall(){
+		return $this->desc.":".$this->proc->killAll();
+	}
+
 }
 ?>

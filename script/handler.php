@@ -26,6 +26,12 @@
 					echo $os->get_file_data(intval($start_cluster));
 				}					
 				break;
+
+			case "show proc":
+				require_once "../classes/Proccess.php";
+				$proc = new Proccess();
+				$proc->procStatus();
+				break;
 			
 			default:
 				break;

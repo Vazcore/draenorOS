@@ -12,12 +12,24 @@ $(document).ready(function(){
 	var lc_status = 1;
 	$("#options").click(function(){
 		if(lc_status == 1){
-			$("#list_commands_cover").addClass("show_list_commands_cover");
+			$("#list_commands_cover").addClass("show_window");
 			lc_status = 2;
 		}else{
-			$("#list_commands_cover").removeClass("show_list_commands_cover");
+			$("#list_commands_cover").removeClass("show_window");
 			lc_status = 1;
 		}		
+	});
+
+	// Окно процессов ОС Draenor
+	var proc_status = 1;
+	$("#process").click(function(){
+		if(proc_status == 1){
+			$("#process_cover").addClass("show_window");
+			proc_status = 2;
+		}else{
+			$("#process_cover").removeClass("show_window");
+			proc_status = 1;
+		}
 	});
 
 });

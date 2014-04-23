@@ -151,5 +151,27 @@ class ListCommand extends Draenor{
 		return $this->desc.":".$this->proc->killAll();
 	}
 
+	function os_wshowproc(){
+		$this->proc->showAll();	
+	}
+
+	function os_wpush(){
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
+			return "Ошибка! Не указано ID процесса";
+		}elseif(!isset($this->allInfo[2]) OR trim($this->allInfo[2]) == ""){
+			return "Ошибка! Не указано число повышения приоритета!";
+		}else{
+			return $this->proc->push($this->allInfo[1], $this->allInfo[2]);		
+		}
+	}
+
+	function os_wkill(){
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
+			return "Ошибка! Не указано ID процесса";
+		}else{
+			return $this->proc->kill($this->allInfo[1]);
+		}
+	}
+
 }
 ?>

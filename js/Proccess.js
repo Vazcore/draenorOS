@@ -2,7 +2,7 @@ var sec = 0;
 function Proccess(){
 
 	this.showProc = function(sec){
-		var type = "show proc";
+		var type = "show proc";		
 		$.ajax({
 			type: "POST",
 			url: "script/handler.php",

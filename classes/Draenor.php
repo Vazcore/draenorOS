@@ -22,7 +22,7 @@ class Draenor{
 
 	function __construct(){
 		if(!isset($_SESSION['user_id'])){
-			//error_reporting(0);
+			error_reporting(0);
 			session_start();
 		}
 	}

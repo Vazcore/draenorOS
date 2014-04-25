@@ -173,5 +173,17 @@ class ListCommand extends Draenor{
 		}
 	}
 
+	function os_wcrmpr(){
+		if(!isset($this->allInfo[1]) OR trim($this->allInfo[1]) == ""){
+			return "Ошибка! Не указано количество процессов";
+		}else{
+			if(!is_numeric($this->allInfo[1])){
+				return "Ошибка! Количество процессов задается целым числом!";
+			}
+			$num = ceil($this->allInfo[1]);
+			return $this->proc->createMultipleProccess($num);
+		}	
+	}
+
 }
 ?>

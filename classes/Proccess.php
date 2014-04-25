@@ -28,6 +28,15 @@ class Proccess extends Draenor{
 		return " Процесс успешно создан!";
 	}
 
+	function createMultipleProccess($num){
+
+		for ($i=1; $i <= $num; $i++) { 
+			$this->createProcess();	
+		}
+
+		return " Процессы успешно созданы!";
+	}
+
 	function killAll(){
 		$this->database->link()->query("TRUNCATE os_proccess");	
 		return " успешно!";	
@@ -52,7 +61,7 @@ class Proccess extends Draenor{
 		$this->dispetch($time, $proc);
 
 		echo "<h2> Общее время: ".$time." секунд</h2>";
-		$res = $this->database->link()->query("SELECT * FROM os_proccess");
+		$res = $this->database->link()->query("SELECT * FROM os_proccess ORDER BY priority DESC, ram ");
 		echo "<table>";
 			echo "<tr>";
 			echo "<td>#<td>";
@@ -123,27 +132,50 @@ class Proccess extends Draenor{
 		$this->stat = array();
 		$this->ochered = array();
 
+		$it = 0;
+
 		$res = $this->database->link()->query("SELECT * FROM os_proccess WHERE status = 'born' OR status = 'work' OR status = 'wait' ORDER BY priority DESC ");
 		while($row = $res->fetch_array()){
 			if($row['lifeTime'] < 7 AND $row['ram'] < ($this->settings->os_ram/4)){
-				$this->otn[]->id = $row['id'];
+				$this->otn[$it]->id = $row['id'];
+				if($row['lifeTime'] > 2){
+					$this->otn[$it]->kvant = ceil($row['lifeTime']/2);
+				}else{
+					$this->otn[$it]->kvant = $row['lifeTime'];
+				}				
 			}else{
-				$this->stat[]->id = $row['id'];
+				$this->stat[$it]->id = $row['id'];
+				if($row['priority'] > 80){
+					$this->stat[$it]->kvant = 4;
+				}else{
+					$this->stat[$it]->kvant = 2;
+				}				
 			}
+			$it++;
 		}
+
+		$it = 0;
 
 		if(count($this->stat) > count($this->otn)){
 			foreach ($this->stat as $key => $value) {
-				$this->ochered[]->id = $value->id;
+				$this->ochered[$it]->id = $value->id;
+				$this->ochered[$it]->kvant = $value->kvant;
+				$it++;
 				if(isset($this->otn[$key]->id)){
-					$this->ochered[]->id = $this->otn[$key]->id;
+					$this->ochered[$it]->id = $this->otn[$key]->id;
+					$this->ochered[$it]->kvant = $this->otn[$key]->kvant;
+					$it++;
 				}
 			}
 		}else{
 			foreach ($this->otn as $key => $value) {
-				$this->ochered[]->id = $value->id;
+				$this->ochered[$it]->id = $value->id;
+				$this->ochered[$it]->kvant = $value->kvant;
+				$it++;
 				if(isset($this->stat[$key]->id)){
-					$this->ochered[]->id = $this->stat[$key]->id;
+					$this->ochered[$it]->id = $this->stat[$key]->id;
+					$this->ochered[$it]->kvant = $this->stat[$key]->kvant;
+					$it++;
 				}
 			}
 		}		
@@ -155,13 +187,16 @@ class Proccess extends Draenor{
 	function dispetch($time){
 		if($_SESSION['proc'] == 0){
 			$start = $this->ochered[0]->id;
-		}else{
-			$start = intval($_SESSION['proc']);
+		}else{			
+			$start = intval($_SESSION['proc']);		
 		}
+
+		$find_proccess = false;
 
 		foreach ($this->ochered as $key => $proc) {
 			
 			if($proc->id == $start){
+				$find_proccess = true;
 				$res = $this->database->link()->query("SELECT * FROM os_proccess WHERE id = '$start' ");
 				$row = $res->fetch_array();
 				$vv = $row['lifeTime'];
@@ -188,7 +223,7 @@ class Proccess extends Draenor{
 					$status = "work";
 					$this->database->link()->query("UPDATE os_proccess SET totalTime = '$tt', nachalo = '$nachalo', konets = '$konets', status = '$status' WHERE id = '$start' ");
 					// Если время - четное, то пора делать кантовку (квант = 2 сек)
-					if($time%2 == 0){
+					if(($row['totalTime']%$proc->kvant) == 0){						
 						$status = "wait";
 						if(isset($this->ochered[$key+1]->id)){
 							$_SESSION['proc'] = $this->ochered[$key+1]->id;
@@ -204,6 +239,10 @@ class Proccess extends Draenor{
 				}
 			}
 
+		}
+
+		if(!$find_proccess){
+			$_SESSION['proc'] = 0;
 		}
 	}	
 }
